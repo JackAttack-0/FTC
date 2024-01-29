@@ -115,12 +115,9 @@ public class DriveRobot extends LinearOpMode
             motor4Power = driveScale*driveInput
                           +sideScale*sideInput
                           -turnScale*turnInput;
-            double scale = 3;
-            if (gamepad1.right_bumper) {
-                scale = 1.5;
-            }
-            if (gamepad1.left_bumper) {
-                scale = 1.0;
+            double scale = 1;
+            if (!gamepad1.right_bumper) {
+                scale = 3.0;
             }
             
             scale=Math.abs(motor1Power)>scale?Math.abs(motor1Power):scale;
@@ -135,8 +132,8 @@ public class DriveRobot extends LinearOpMode
             
             YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
             
-            telemetry.addData("!","==HEADS_UP==");
-            telemetry.addData("","");
+            telemetry.addLine("==HEADS_UP==");
+            telemetry.addLine();
             
             telemetry.addData("ACTION", action);
             telemetry.addData("HEADING", "%.2f Deg.", orientation.getYaw(AngleUnit.DEGREES));
@@ -144,9 +141,9 @@ public class DriveRobot extends LinearOpMode
             telemetry.addData("CLAW", clawStatus);
             telemetry.addData("HANGING", hangingStatus);
             
-            telemetry.addData("","");
-            telemetry.addData("!","==DIAGNOSTICS==");
-            telemetry.addData("","");
+            telemetry.addLine();
+            telemetry.addLine("==DIAGNOSTICS==");
+            telemetry.addLine();
 
             telemetry.addData("motor1", motor1Power/scale);
             telemetry.addData("motor2", motor2Power/scale);
@@ -208,7 +205,7 @@ public class DriveRobot extends LinearOpMode
                 driveToDistance(300);
                 wristDown();
                 release();
-                drive(-70, 1);
+                drive(-70);
                 contractLift();
                 sleep(1000);
                 stopLift();
@@ -279,27 +276,18 @@ public class DriveRobot extends LinearOpMode
             }
 
             if(gamepad2.left_bumper) {
-               hangerL.setPower(-.75);
-               hangerR.setPower(.75);
-               sleep(4000);
-               hangerL.setPower(0);
-               hangerR.setPower(0);
-               raiseHooks();
-               action="HOOKS RAISED";
-               hangingStatus="Hooks Raised";
+                raiseHooks();
+                action="HOOKS RAISED";
+                hangingStatus="Hooks Raised";
             }
 
             if(gamepad2.right_bumper) {
                 lowerHooks();
-                sleep(1000);
-                hangerL.setPower(.75);
-               hangerR.setPower(-.75);
-               sleep(3500);
-               hangerL.setPower(0);
-               hangerR.setPower(0);
-               action="HOOKS LOWERED";
-               hangingStatus="Hooks Lowered";
+                action="HOOKS LOWERED";
+                hangingStatus="Hooks Lowered";
             }
+
+
 
             telemetry.update();
             action="NONE";
@@ -329,171 +317,6 @@ public class DriveRobot extends LinearOpMode
         wrist.setPosition(0);
     }
     
-    
-
-    void loadDrone() {
-        launcher.setPosition(0.35);
-    }
-
-    void launchDrone() {
-        launcher.setPosition(0.25);
-        isPlaneLaunched = true;
-    }
-
-    void hangerDown() {
-        hangerL.setPower(.3);
-        hangerR.setPower(-.3);
-        isHangerMoving = true; 
-    }
-
-    void hangerRaise() {
-        hangerL.setPower(-.75);
-        hangerR.setPower(.75);
-        isHangerMoving = true; 
-
-    }
-
-     void stopHanger() {
-        hangerL.setPower(0);
-        hangerR.setPower(0);
-        isHangerMoving = false;
-    }
-
-
-    void extendLift() {
-        liftL.setPower(.65);
-        liftR.setPower(-.65);
-        hangerL.setPower(1.0);
-        hangerR.setPower(-1.0);
-        isLiftMoving = true; 
-    }
-
-    void contractLift() {
-        liftL.setPower(-.65);
-        liftR.setPower(.65);
-        hangerL.setPower(-1.0);
-        hangerR.setPower(1.0);
-        isLiftMoving = true; 
-    }
-
-    void stopLift() {
-        liftL.setPower(0);
-        liftR.setPower(0);
-        hangerL.setPower(0);
-        hangerR.setPower(0);
-        isLiftMoving = false;
-    }
-    
-    void raiseHooks() {
-        hangingServoL.setPosition(0.65);
-        //hangingServoR.setPosition(0);
-    }
-    
-    void lowerHooks() {
-        hangingServoL.setPosition(0.1);
-        //hangingServoR.setPosition(-1);
-    }
-
-    double getDistance() {
-        return distanceSensor.getDistance(DistanceUnit.MM);
-    }   
-    int getDistanceL() {
-        return (int)distanceSensorL.getDistance(DistanceUnit.MM);
-    }   
-    int getDistanceR() {
-        return (int)distanceSensorR.getDistance(DistanceUnit.MM);
-    }   
-
-    boolean seeBlock(int distance) {
-        if(getDistance()<=distance) {
-            return true;
-        } else {
-            return false;
-        }
-    } 
-
-    public void drive(int distance, int randomization) {
-        // Constants to use when driving the robot
-
-        // To convert cm into motor position counter values
-        final double DISTANCE_CONSTANT=2;
-        // What power to use to drive the robot
-        final double DRIVE_POWER=0.8;
-        // What power to use to drive the robot
-        final double MIN_POWER=0.1;
-        // How long to pause before checking movement
-        final int SLEEP_INTERVAL=10;
-        // Acceleration distance (in encoder clicks). 300mm in this case:
-        final double ACCEL_DIST=300.0*DISTANCE_CONSTANT;
-
-        int targetPosition=(int)DISTANCE_CONSTANT*distance;
-
-        for(DcMotor motor : motors) {
-            // Stop and reset the motor counter
-            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            // Set the target position by converting the distance into motor
-            // position values
-            motor.setTargetPosition(targetPosition);       
-            // Set the motor into the mode that uses the encoder to keep
-            // track of the position
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                 
-        }
-        
-        telemetry.addData("motor1",motor1.getCurrentPosition());
-        telemetry.update();
-
-        // Sleep a bit to make sure the motor report as "busy"
-        sleep(SLEEP_INTERVAL);
-        // Loop as long as either motor reports as busy
-        boolean isBusy=false;
-        do {
-
-            int currentPosition=motor1.getCurrentPosition();
-            telemetry.addData("motor1", currentPosition);
-            telemetry.addData("randomization", randomization);
-            
-            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-            
-            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
-            telemetry.addData("distance", getDistance());
-            telemetry.addData("distanceL", getDistanceL());
-            telemetry.addData("distanceR", getDistanceR());
-    
-            // Determine the closest distance to either starting position
-            // or target. When close to start, we accelerate, when close to 
-            // target, we decelerate. When we are far from both, the robot 
-            // drives at DRIVE_POWER speed. To avoid not moving at all, the
-            // minimum speed is set to MIN_POWER. The distance over which to 
-            // accerate or decelerate is ACCEL_DIST. All math is done in 
-            // encoder "clicks", 300 mm is about 600 encoder clicks.
-            int lengthToTarget=Math.abs(targetPosition-currentPosition);
-            if (lengthToTarget>Math.abs(currentPosition)) {
-                lengthToTarget=Math.abs(currentPosition);
-            }
-            
-            double power=(DRIVE_POWER-MIN_POWER)*(lengthToTarget/ACCEL_DIST)+MIN_POWER;
-            if(lengthToTarget>=ACCEL_DIST) {
-                power=DRIVE_POWER;
-            }
-            
-            for(DcMotor motor : motors) {
-              motor.setPower(power);
-            }
-    
-            // Sleep until next check
-            sleep(SLEEP_INTERVAL);
-            isBusy=false;
-            for(DcMotor motor : motors) {
-                if(motor.isBusy())isBusy=true;
-            }
-        } while(isBusy);
-
-        for(DcMotor motor : motors) {
-            motor.setPower(0);
-            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }        
-    } 
     void turn(int angle) {
         imu.resetYaw();
         sleep(50);
@@ -575,7 +398,170 @@ public class DriveRobot extends LinearOpMode
         return orientation.getYaw(AngleUnit.DEGREES);
     }
 
-    public void strafe(int distance, int randomization) {
+    void loadDrone() {
+        launcher.setPosition(0.35);
+    }
+
+    void launchDrone() {
+        launcher.setPosition(0.25);
+        isPlaneLaunched = true;
+    }
+
+    void hangerDown() {
+        hangerL.setPower(.3);
+        hangerR.setPower(-.3);
+        isHangerMoving = true; 
+    }
+
+    void hangerRaise() {
+        hangerL.setPower(-.75);
+        hangerR.setPower(.75);
+        isHangerMoving = true; 
+
+    }
+
+     void stopHanger() {
+        hangerL.setPower(0);
+        hangerR.setPower(0);
+        isHangerMoving = false;
+    }
+
+
+    void extendLift() {
+        liftL.setPower(.85);
+        liftR.setPower(-.85);
+        hangerL.setPower(.90);
+        hangerR.setPower(-.90);
+        isLiftMoving = true; 
+    }
+
+    void contractLift() {
+        liftL.setPower(-.85);
+        liftR.setPower(.85);
+        hangerL.setPower(-.90);
+        hangerR.setPower(.90);
+        isLiftMoving = true; 
+    }
+
+    void stopLift() {
+        liftL.setPower(0);
+        liftR.setPower(0);
+        hangerL.setPower(0);
+        hangerR.setPower(0);
+        isLiftMoving = false;
+    }
+    
+    void raiseHooks() {
+        hangingServoL.setPosition(0.65);
+        //hangingServoR.setPosition(0);
+    }
+    
+    void lowerHooks() {
+        hangingServoL.setPosition(0.1);
+        //hangingServoR.setPosition(-1);
+    }
+
+    double getDistance() {
+        return distanceSensor.getDistance(DistanceUnit.MM);
+    }   
+    int getDistanceL() {
+        return (int)distanceSensorL.getDistance(DistanceUnit.MM);
+    }   
+    int getDistanceR() {
+        return (int)distanceSensorR.getDistance(DistanceUnit.MM);
+    }   
+
+    boolean seeBlock(int distance) {
+        if(getDistance()<=distance) {
+            return true;
+        } else {
+            return false;
+        }
+    } 
+
+    public void drive(int distance) {
+        // Constants to use when driving the robot
+
+        // To convert cm into motor position counter values
+        final double DISTANCE_CONSTANT=2;
+        // What power to use to drive the robot
+        final double DRIVE_POWER=0.8;
+        // What power to use to drive the robot
+        final double MIN_POWER=0.1;
+        // How long to pause before checking movement
+        final int SLEEP_INTERVAL=10;
+        // Acceleration distance (in encoder clicks). 300mm in this case:
+        final double ACCEL_DIST=300.0*DISTANCE_CONSTANT;
+
+        int targetPosition=(int)DISTANCE_CONSTANT*distance;
+
+        for(DcMotor motor : motors) {
+            // Stop and reset the motor counter
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            // Set the target position by converting the distance into motor
+            // position values
+            motor.setTargetPosition(targetPosition);       
+            // Set the motor into the mode that uses the encoder to keep
+            // track of the position
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                 
+        }
+        
+        telemetry.addData("motor1",motor1.getCurrentPosition());
+        telemetry.update();
+
+        // Sleep a bit to make sure the motor report as "busy"
+        sleep(SLEEP_INTERVAL);
+        // Loop as long as either motor reports as busy
+        boolean isBusy=false;
+        do {
+
+            int currentPosition=motor1.getCurrentPosition();
+            telemetry.addData("motor1", currentPosition);
+            
+            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+            
+            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
+            telemetry.addData("distance", getDistance());
+            telemetry.addData("distanceL", getDistanceL());
+            telemetry.addData("distanceR", getDistanceR());
+    
+            // Determine the closest distance to either starting position
+            // or target. When close to start, we accelerate, when close to 
+            // target, we decelerate. When we are far from both, the robot 
+            // drives at DRIVE_POWER speed. To avoid not moving at all, the
+            // minimum speed is set to MIN_POWER. The distance over which to 
+            // accerate or decelerate is ACCEL_DIST. All math is done in 
+            // encoder "clicks", 300 mm is about 600 encoder clicks.
+            int lengthToTarget=Math.abs(targetPosition-currentPosition);
+            if (lengthToTarget>Math.abs(currentPosition)) {
+                lengthToTarget=Math.abs(currentPosition);
+            }
+            
+            double power=(DRIVE_POWER-MIN_POWER)*(lengthToTarget/ACCEL_DIST)+MIN_POWER;
+            if(lengthToTarget>=ACCEL_DIST) {
+                power=DRIVE_POWER;
+            }
+            
+            for(DcMotor motor : motors) {
+              motor.setPower(power);
+            }
+    
+            // Sleep until next check
+            sleep(SLEEP_INTERVAL);
+            isBusy=false;
+            for(DcMotor motor : motors) {
+                if(motor.isBusy())isBusy=true;
+            }
+        } while(isBusy);
+
+        for(DcMotor motor : motors) {
+            motor.setPower(0);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }        
+    } 
+
+    public void strafe(int distance) {
         // Constants to use when driving the robot
 
         // To convert cm into motor position counter values
@@ -622,14 +608,6 @@ public class DriveRobot extends LinearOpMode
 
             int currentPosition=motor1.getCurrentPosition();
             telemetry.addData("motor1",currentPosition);
-            telemetry.addData("randomization", randomization);
-            
-            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-            
-            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
-            telemetry.addData("distance", getDistance());
-            telemetry.addData("distanceL", getDistanceL());
-            telemetry.addData("distanceR", getDistanceR());
             telemetry.update();
     
             // Determine the closest distiance to either starting position
