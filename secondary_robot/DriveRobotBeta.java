@@ -4,7 +4,7 @@
  */
 
 
-package org.firstinspires.ftc.teamcode;
+package secondary_robot;
 //https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
