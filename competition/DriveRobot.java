@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.*;
+
+import java.nio.charset.spi.CharsetProvider;
 import java.util.List;
 
 @TeleOp(name="DriveRobot", group ="Concept")
@@ -15,58 +17,61 @@ public class DriveRobot extends LinearOpMode
     // action on all 4 motors.
     DcMotor    motors[]  = new DcMotor[4];
 
-    DcMotor    motor1   = null;
-    DcMotor    motor2   = null;
-    DcMotor    motor3   = null;
-    DcMotor    motor4   = null;
-    DcMotor    hangerL  = null;
-    DcMotor    hangerR  = null;
-    Servo      launcher = null;
-    Servo      claw    = null;
-    Servo      wrist    = null;
-    Servo      hangingServoL = null;
-    //Servo      hangingServoR = null;
-    DcMotor    liftR    = null;
-    DcMotor    liftL    = null;
-    boolean    isLiftMoving = false;
-    boolean    isHangerMoving = false;
+    DcMotor    motor1          = null;
+    DcMotor    motor2          = null;
+    DcMotor    motor3          = null;
+    DcMotor    motor4          = null;
+    DcMotor    hangerL         = null;
+    DcMotor    hangerR         = null;
+    DcMotor    liftR           = null;
+    DcMotor    liftL           = null;
+    Servo      launcher        = null;
+    Servo      claw            = null;
+    Servo      wrist           = null;
+    CRServo    scissorL        = null;
+    CRServo    scissorR        = null;
+    boolean    isLiftMoving    = false;
+    boolean    isHangerMoving  = false;
     boolean    isPlaneLaunched = false;  
-    boolean    wristUp=false;
-    boolean    wristHigh=false;
-    boolean    clawClosed=false;
-    String     wristStatus="void";
-    String     clawStatus="void";
-    String     hangingStatus="void";
-    String     action="void";
+    boolean    wristUp         = false;
+    boolean    wristHigh       = false;
+    boolean    clawClosed      = false;
+    String     wristStatus     = "void";
+    String     clawStatus      = "void";
+    String     hangingStatus   = "void";
+    String     action          = "void";
     DistanceSensor distanceSensor = null;
     DistanceSensor distanceSensorL = null;
     DistanceSensor distanceSensorR = null;
-    IMU imu = null;
+    IMU imu                    = null;
  
     void initRobot() {
-        imu = hardwareMap.get(IMU.class, "imu");
+        imu      = hardwareMap.get(IMU.class, "imu");
         
-        motor1  = hardwareMap.get(DcMotor.class, "motor1");
-        motor2  = hardwareMap.get(DcMotor.class, "motor2");
-        motor3  = hardwareMap.get(DcMotor.class, "motor3");
-        motor4  = hardwareMap.get(DcMotor.class, "motor4");
-        hangerL  = hardwareMap.get(DcMotor.class, "hangerL");
-        hangerR  = hardwareMap.get(DcMotor.class, "hangerR");
+        motor1   = hardwareMap.get(DcMotor.class, "motor1");
+        motor2   = hardwareMap.get(DcMotor.class, "motor2");
+        motor3   = hardwareMap.get(DcMotor.class, "motor3");
+        motor4   = hardwareMap.get(DcMotor.class, "motor4");
+
         motors[0]=(motor1);
         motors[1]=(motor2);
         motors[2]=(motor3);
         motors[3]=(motor4);
 
+        liftR    = hardwareMap.get(DcMotor.class, "liftR");
+        liftL    = hardwareMap.get(DcMotor.class, "liftL");
+
+        hangerL  = hardwareMap.get(DcMotor.class, "hangerL");
+        hangerR  = hardwareMap.get(DcMotor.class, "hangerR");
+        
         launcher = hardwareMap.get(Servo.class, "launcher");
-        claw    = hardwareMap.get(Servo.class, "claw");
+        claw     = hardwareMap.get(Servo.class, "claw");
       
         wrist    = hardwareMap.get(Servo.class, "wrist");
 
-        hangingServoL   = hardwareMap.get(Servo.class, "hangingServoL");
-        //hangingServoR   = hardwareMap.get(Servo.class, "hangingServoR");
+        scissorL = hardwareMap.get(CRServo.class, "scissorL");
+        scissorR = hardwareMap.get(CRServo.class, "scissorR");
         
-        liftR    = hardwareMap.get(DcMotor.class, "liftR");
-        liftL    = hardwareMap.get(DcMotor.class, "liftL");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
         distanceSensorL = hardwareMap.get(DistanceSensor.class, "distanceSensorL");
         distanceSensorR = hardwareMap.get(DistanceSensor.class, "distanceSensorR");
@@ -115,9 +120,9 @@ public class DriveRobot extends LinearOpMode
             motor4Power = driveScale*driveInput
                           +sideScale*sideInput
                           -turnScale*turnInput;
-            double scale = 1;
-            if (!gamepad1.right_bumper) {
-                scale = 3.0;
+            double scale = 3.0;
+            if (gamepad1.right_bumper) {
+                scale = 1.0;
             }
             
             scale=Math.abs(motor1Power)>scale?Math.abs(motor1Power):scale;
@@ -159,7 +164,7 @@ public class DriveRobot extends LinearOpMode
             telemetry.addData("distanceL", getDistanceL());
             telemetry.addData("distanceR", getDistanceR());
 
-          /*  if(gamepad1.dpad_right) {
+            if(gamepad1.dpad_right) {
                 if(gamepad1.right_bumper) {
                     turn(-15);
                 } else {
@@ -174,7 +179,7 @@ public class DriveRobot extends LinearOpMode
                     turn(90);
                 }
             }
-            */
+            
 
             if(gamepad2.dpad_up){
                 launchDrone();
@@ -195,9 +200,6 @@ public class DriveRobot extends LinearOpMode
                 sleep(200);
             }
 
-            //if (gamepad1.a) {
-            //        strafe(-130+getDistanceR());
-            //}
             if(gamepad1.dpad_up){
                 extendLift();
                 sleep(1000);
@@ -302,6 +304,15 @@ public class DriveRobot extends LinearOpMode
 
     void grab() {
         claw.setPosition(1);
+        
+    }
+
+    void raiseHooks() {
+        scissorL.setPosition(-1);
+        scissorR.setPosition(1);
+        sleep(2200);
+        scissorL.setPosition(0);
+        scissorR.setPosition(0);
         
     }
 
@@ -449,16 +460,6 @@ public class DriveRobot extends LinearOpMode
         hangerL.setPower(0);
         hangerR.setPower(0);
         isLiftMoving = false;
-    }
-    
-    void raiseHooks() {
-        hangingServoL.setPosition(0.65);
-        //hangingServoR.setPosition(0);
-    }
-    
-    void lowerHooks() {
-        hangingServoL.setPosition(0.1);
-        //hangingServoR.setPosition(-1);
     }
 
     double getDistance() {
