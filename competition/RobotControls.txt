@@ -5,11 +5,13 @@ Y             arm (board/down)
 X             arm (up/board)
 
 dpad_up       launch drone and reload
+dpad_left     (with right_bumper or left_bumper, runs the left scissor up or down corresponding to the button)
+dpad_right     (with right_bumper or left_bumper, runs the right scissor up or down corresponding to the button)
 
 right_trigger lift extend
 left_trigger  lift contract
-right_bumper  lower hangers (with slack)
-left_bumper   raise hangers (with slack)
+right_bumper  lower hangers (scissor) (using dpad_left or dpad_right will only run the left or right corresponding scissor)
+left_bumper   raise hangers (scissor) (using dpad_left or dpad_right will only run the left or right corresponding scissor)
 
 
 // Drive Controls
@@ -25,5 +27,5 @@ dpad_left     turn 90 (15 with right_bumper) (disabled as of 1/16)
 dpad_down     turn 180 (not recommended for competition usage)
 
 
-A             lower hanger (just servo)
-B             raise hanger (just servo)
+A             lower (hanging motors)
+B             raise (hanging motors)
