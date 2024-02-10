@@ -6,7 +6,7 @@ X             arm (up/board)
 
 dpad_up       launch drone and reload
 dpad_left     (with right_bumper or left_bumper, runs the left scissor up or down corresponding to the button)
-dpad_right     (with right_bumper or left_bumper, runs the right scissor up or down corresponding to the button)
+dpad_right    (with right_bumper or left_bumper, runs the right scissor up or down corresponding to the button)
 
 right_trigger lift extend
 left_trigger  lift contract

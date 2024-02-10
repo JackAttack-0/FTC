@@ -315,16 +315,10 @@ public class DriveRobot extends LinearOpMode
     }
     
     void raiseHooks(boolean left, boolean right) {
-        if (left==true) {
-            scissorL.setPower(1);
-        }
-        if (right==true) {
-            scissorR.setPower(-1);
-        }
-        if (right==false && left==false) {
-            scissorR.setPower(-1);
-            scissorL.setPower(1);
-        }
+        scissorL.setPower((left) ? 1 : 0);
+        scissorR.setPower((right) ? -1 : 0);
+        scissorL.setPower((!left && !right) ? 1 : 0);
+        scissorR.setPower((!left && !right) ? -1 : 0);
         sleep(200);
         scissorL.setPower(0);
         scissorR.setPower(0);
@@ -332,16 +326,10 @@ public class DriveRobot extends LinearOpMode
     }
     
     void lowerHooks(boolean left, boolean right) {
-        if (left==true) {
-            scissorL.setPower(-1);
-        }
-        if (right==true) {
-            scissorR.setPower(1);
-        }
-        if (right==false && left==false) {
-            scissorR.setPower(1);
-            scissorL.setPower(-1);
-        }
+        scissorL.setPower((left) ? -1 : 0);
+        scissorR.setPower((right) ? 1 : 0);
+        scissorL.setPower((!left && !right) ? -1 : 0);
+        scissorR.setPower((!left && !right) ? 1 : 0);
         sleep(200);
         scissorL.setPower(0);
         scissorR.setPower(0);
