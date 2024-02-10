@@ -237,7 +237,7 @@ public class DriveRobot extends LinearOpMode
                 }
                 sleep(500);
             }
-            
+
             if(gamepad2.a) {
                 liftPixel();
             }
@@ -315,10 +315,10 @@ public class DriveRobot extends LinearOpMode
     }
     
     void raiseHooks(boolean left, boolean right) {
-        scissorL.setPower((left) ? 1 : 0);
-        scissorR.setPower((right) ? -1 : 0);
-        scissorL.setPower((!left && !right) ? 1 : 0);
-        scissorR.setPower((!left && !right) ? -1 : 0);
+        scissorL.setPower((left)?1 : 0);
+        scissorR.setPower((right)?-1:0);
+        scissorL.setPower((!left&&!right)?1:0);
+        scissorR.setPower((!left&&!right)?-1:0);
         sleep(200);
         scissorL.setPower(0);
         scissorR.setPower(0);
@@ -326,8 +326,8 @@ public class DriveRobot extends LinearOpMode
     }
     
     void lowerHooks(boolean left, boolean right) {
-        scissorL.setPower((left) ? -1 : 0);
-        scissorR.setPower((right) ? 1 : 0);
+        scissorL.setPower((left)?-1:0);
+        scissorR.setPower((right)?1:0);
         scissorL.setPower((!left && !right) ? -1 : 0);
         scissorR.setPower((!left && !right) ? 1 : 0);
         sleep(200);
