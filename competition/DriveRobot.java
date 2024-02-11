@@ -328,8 +328,8 @@ public class DriveRobot extends LinearOpMode
     void lowerHooks(boolean left, boolean right) {
         scissorL.setPower((left)?-1:0);
         scissorR.setPower((right)?1:0);
-        scissorL.setPower((!left && !right) ? -1 : 0);
-        scissorR.setPower((!left && !right) ? 1 : 0);
+        scissorL.setPower((!left&&!right)?-1:0);
+        scissorR.setPower((!left&&!right)?1:0);
         sleep(200);
         scissorL.setPower(0);
         scissorR.setPower(0);
