@@ -34,28 +34,28 @@ public class DriveRobotBeta extends LinearOpMode
     // action on all 4 motors.
     DcMotor    motors[]  = new DcMotor[4];
 
-    DcMotor    motor1   = null;
-    DcMotor    motor2   = null;
-    DcMotor    motor3   = null;
-    DcMotor    motor4   = null;
+    DcMotor    frontLeftDrive   = null;
+    DcMotor    frontRightDrive   = null;
+    DcMotor    backLeftDrive   = null;
+    DcMotor    backRightDrive   = null;
     IMU imu = null;
  
     void initRobot() {
         imu = hardwareMap.get(IMU.class, "imu");
         
-        motor1  = hardwareMap.get(DcMotor.class, "motor1");
-        motor2  = hardwareMap.get(DcMotor.class, "motor2");
-        motor3  = hardwareMap.get(DcMotor.class, "motor3");
-        motor4  = hardwareMap.get(DcMotor.class, "motor4");
-        motors[0]=(motor1);
-        motors[1]=(motor2);
-        motors[2]=(motor3);
-        motors[3]=(motor4);
+        frontLeftDrive  = hardwareMap.get(DcMotor.class, "frontLeftDrive");
+        frontRightDrive  = hardwareMap.get(DcMotor.class, "frontRightDrive");
+        backLeftDrive  = hardwareMap.get(DcMotor.class, "backLeftDrive");
+        backRightDrive  = hardwareMap.get(DcMotor.class, "backRightDrive");
+        motors[0]=(frontLeftDrive);
+        motors[1]=(frontRightDrive);
+        motors[2]=(backLeftDrive);
+        motors[3]=(backRightDrive);
 
-        motor1.setDirection(DcMotor.Direction.REVERSE);
-        motor2.setDirection(DcMotor.Direction.FORWARD);
-        motor3.setDirection(DcMotor.Direction.REVERSE);
-        motor4.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // Move drone servo to loaded position
         loadDrone();
@@ -71,10 +71,10 @@ public class DriveRobotBeta extends LinearOpMode
         
         while (opModeIsActive())
         {
-            double motor1Power = 0;
-            double motor2Power = 0;
-            double motor3Power = 0;
-            double motor4Power = 0;
+            double frontLeftDrivePower = 0;
+            double frontRightDrivePower = 0;
+            double backLeftDrivePower = 0;
+            double backRightDrivePower = 0;
             
             double driveScale=-1;
             double sideScale=1;
@@ -84,16 +84,16 @@ public class DriveRobotBeta extends LinearOpMode
             double sideInput  = gamepad1.left_stick_x;
             double turnInput  = gamepad1.right_stick_x;
 
-            motor1Power = driveScale*driveInput
+            frontLeftDrivePower = driveScale*driveInput
                           +sideScale*sideInput
                           +turnScale*turnInput;
-            motor2Power = driveScale*driveInput
+            frontRightDrivePower = driveScale*driveInput
                           -sideScale*sideInput
                           -turnScale*turnInput;
-            motor3Power = driveScale*driveInput
+            backLeftDrivePower = driveScale*driveInput
                           -sideScale*sideInput
                           +turnScale*turnInput;
-            motor4Power = driveScale*driveInput
+            backRightDrivePower = driveScale*driveInput
                           +sideScale*sideInput
                           -turnScale*turnInput;
             double scale = 1;
@@ -101,22 +101,22 @@ public class DriveRobotBeta extends LinearOpMode
                 scale = 3.0;
             }
             
-            scale=Math.abs(motor1Power)>scale?Math.abs(motor1Power):scale;
-            scale=Math.abs(motor2Power)>scale?Math.abs(motor2Power):scale;
-            scale=Math.abs(motor3Power)>scale?Math.abs(motor3Power):scale;
-            scale=Math.abs(motor4Power)>scale?Math.abs(motor4Power):scale;
+            scale=Math.abs(frontLeftDrivePower)>scale?Math.abs(frontLeftDrivePower):scale;
+            scale=Math.abs(frontRightDrivePower)>scale?Math.abs(frontRightDrivePower):scale;
+            scale=Math.abs(backLeftDrivePower)>scale?Math.abs(backLeftDrivePower):scale;
+            scale=Math.abs(backRightDrivePower)>scale?Math.abs(backRightDrivePower):scale;
 
-            motor1.setPower(motor1Power/scale);
-            motor2.setPower(motor2Power/scale);
-            motor3.setPower(motor3Power/scale);
-            motor4.setPower(motor4Power/scale);
+            frontLeftDrive.setPower(frontLeftDrivePower/scale);
+            frontRightDrive.setPower(frontRightDrivePower/scale);
+            backLeftDrive.setPower(backLeftDrivePower/scale);
+            backRightDrive.setPower(backRightDrivePower/scale);
             
             YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
 
-            telemetry.addData("motor1", motor1Power/scale);
-            telemetry.addData("motor2", motor2Power/scale);
-            telemetry.addData("motor3", motor3Power/scale);
-            telemetry.addData("motor4", motor4Power/scale);
+            telemetry.addData("frontLeftDrive", frontLeftDrivePower/scale);
+            telemetry.addData("frontRightDrive", frontRightDrivePower/scale);
+            telemetry.addData("backLeftDrive", backLeftDrivePower/scale);
+            telemetry.addData("backRightDrive", backRightDrivePower/scale);
             
             
             telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
@@ -144,10 +144,10 @@ public class DriveRobotBeta extends LinearOpMode
         while(remainingAngle>0.5) {
 
             double power=getTurnPower(remainingAngle);
-            motor1.setPower(-1*direction*power);
-            motor2.setPower(1*direction*power);
-            motor3.setPower(-1*direction*power);
-            motor4.setPower(1*direction*power);
+            frontLeftDrive.setPower(-1*direction*power);
+            frontRightDrive.setPower(1*direction*power);
+            backLeftDrive.setPower(-1*direction*power);
+            backRightDrive.setPower(1*direction*power);
             currentAngle=getAngle();
 
             // Adjust angle for angles greater than 180 or less than -180
@@ -255,7 +255,7 @@ public class DriveRobotBeta extends LinearOpMode
                  
         }
         
-        telemetry.addData("motor1",motor1.getCurrentPosition());
+        telemetry.addData("frontLeftDrive",frontLeftDrive.getCurrentPosition());
         telemetry.update();
 
         // Sleep a bit to make sure the motor report as "busy"
@@ -264,8 +264,8 @@ public class DriveRobotBeta extends LinearOpMode
         boolean isBusy=false;
         do {
 
-            int currentPosition=motor1.getCurrentPosition();
-            telemetry.addData("motor1", currentPosition);
+            int currentPosition=frontLeftDrive.getCurrentPosition();
+            telemetry.addData("frontLeftDrive", currentPosition);
             
             YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
             
@@ -356,7 +356,7 @@ public class DriveRobotBeta extends LinearOpMode
             motorNumber++;            
         }
         
-        telemetry.addData("motor1",motor1.getCurrentPosition());
+        telemetry.addData("frontLeftDrive",frontLeftDrive.getCurrentPosition());
         telemetry.update();
 
         // Sleep a bit to make sure the motor report as "busy"
@@ -365,8 +365,8 @@ public class DriveRobotBeta extends LinearOpMode
         boolean isBusy=false;
         do {
 
-            int currentPosition=motor1.getCurrentPosition();
-            telemetry.addData("motor1",currentPosition);
+            int currentPosition=frontLeftDrive.getCurrentPosition();
+            telemetry.addData("frontLeftDrive",currentPosition);
             telemetry.update();
     
             // Determine the closest distiance to either starting position
